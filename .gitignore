@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Julie's things
+tips.md
+
+# Big files
+src/data/langmodels/
