@@ -23,11 +23,11 @@ from nltk.corpus import stopwords
 import translators as ts
 
 class Pipe:
-    def __init__(self,foreign_lan,stop_lang,lang, de_model, seq_len):
+    def __init__(self,foreign_lan,stop_lang,lang, lan_model, seq_len):
         self.foreign_lan = foreign_lan
         self.stop_lang = stop_lang
         self.lang = lang
-        self.de_model = de_model
+        self.lan_model = lan_model
         self.seq_len = seq_len
 
     def stop_words(self):
@@ -112,8 +112,8 @@ class Pipe:
             for j, token in enumerate(review[:128]): # Making sure that maximum # of tokens is 128
                 
                 # TODO: Eng model
-                if token in self.de_model:
-                    emb_en[j] = self.de_model[token]
+                if token in self.lan_model:
+                    emb_en[j] = self.lan_model[token]
                 else:
                     emb_en[j] = np.zeros(300)
             

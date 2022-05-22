@@ -1,9 +1,10 @@
 import pandas as pd
+import datasets
 from datasets import load_dataset
 import gensim
 import requests
 
-def load_w2vec_model(url, LOCAL_DATA):
+def load_w2vec_model(url, LOCAL_MODEL):
     """Apapted from:
     https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
     """
@@ -11,7 +12,7 @@ def load_w2vec_model(url, LOCAL_DATA):
     local_filename = url.split('/')[-1]
     filepath = f"data/langmodels/{local_filename}"
 
-    if not LOCAL_DATA:
+    if not LOCAL_MODEL:
         print('> Downloading word2vec models.\n')
         with requests.get(url, stream=True) as r:
             r.raise_for_status()
