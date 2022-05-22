@@ -137,3 +137,4 @@ tips.md
 # Big files
 src/data/langmodels/*.vec
 src/data/raw/*.csv
+src/data/trainedmodels/*.model

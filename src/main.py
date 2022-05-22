@@ -1,9 +1,10 @@
+
 print('> Loading modules\n')
 
 from utilities.translation_pipeline import Pipe
 from utilities.loaders import load_reviews, load_w2vec_model
+from utilities.lstm import LSTM, loss_calc
 
-from utilities.lstm import LSTM_test, loss_calc
 import warnings
 #from datasets import load_dataset
 
@@ -15,6 +16,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
+import numpy as np
 
 warnings.filterwarnings('ignore')
 
@@ -24,7 +26,8 @@ LOCAL_MODEL = True
 
 def main():
 
-    data = load_reviews(LOCAL_DATA)
+    # --------- Training phase
+    data = load_reviews(LOCAL_DATA, 'train')
     de_model = load_w2vec_model(
         "https://dl.fbaipublicfiles.com/fasttext/vectors-aligned/wiki.de.align.vec",
         LOCAL_DATA
@@ -45,30 +48,33 @@ def main():
     ge_df = german_data.loc[(german_data['product_category']=='home'),['review_body', 'language','sentiment', 'product_category']]
 
     print('> Transforming the data into tensors')
-    pipe = Pipe(ge_df,'german','de',de_model,128)
+    pipe = Pipe(ge_df[:10],'german','de',de_model,128)
     torch_data = pipe.emb()
-    print(f"Torch data shape: {torch_data.shape}")
- 
-
-    shuf_ge_df = ge_df.sample(frac=1)
-    target = shuf_ge_df['sentiment'].to_numpy()[:10]
-
+    print(f"Torch data shape: {torch_data.shape}\n")
+    
+    print('> Putting data into DataLoader\n')
+    target = ge_df['sentiment'].to_numpy()[:10]
     target = torch.from_numpy(target).float().reshape(-1,1)
-
     td = TensorDataset(torch_data, target)
-    dl = DataLoader(td, batch_size=20, shuffle=True)
+    training_loader = DataLoader(td, batch_size=5, shuffle=True)
 
-    model = LSTM_test()
+    lstm = LSTM()
+    lstm.train(
+        epochs=2,
+        trainloader=training_loader
+    )
 
-    loss = loss_calc(10, td, dl)
-    print(loss)
+    print("> Training performance")
+    for i, traindata in enumerate(training_loader):
+        x, y_true = traindata
+        probs = torch.flatten(lstm.model(x))
+        yhat = probs.detach().apply_(lambda prob: 1 if prob > .5 else 0)
+        correct = (yhat==y_true.flatten()).sum().item()
+        print(f'>> Batch {i} | Accuracy: {correct/y_true.size(0)}')
+    print()
 
-
-
-    pred = torch.round(model(torch_data[:10])[0])
-    acc = sum(pred == target[:10]) / 10
-
-
+    # --------- Validation phase
+    # TODO: change training loader to validation_loader
 
 
 

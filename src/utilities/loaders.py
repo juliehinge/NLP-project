@@ -26,14 +26,14 @@ def load_w2vec_model(url, LOCAL_MODEL):
 
     return model
 
-def load_reviews(LOCAL_DATA):
+def load_reviews(LOCAL_DATA, which):
 
     if LOCAL_DATA:
-        print('> Loading dataset from the local file.\n')
-        data = pd.read_csv('data/raw/raw.csv')
+        print(f'> Loading {which} dataset from the local file.\n')
+        data = pd.read_csv(f'data/raw/raw_{which}.csv')
     else:
-        print('> Downloading remote dataset (10 min)\n')
-        data = pd.DataFrame(datasets.load_dataset('amazon_reviews_multi')["train"])
-        data.to_csv('data/raw/raw.csv', sep=',', index=False)
+        print(f'> Downloading remote {which} dataset (10 min)\n')
+        data = pd.DataFrame(datasets.load_dataset('amazon_reviews_multi')[which])
+        data.to_csv(f'data/raw/raw_{which}.csv', sep=',', index=False)
 
     return data

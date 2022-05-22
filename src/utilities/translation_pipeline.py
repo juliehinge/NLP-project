@@ -40,7 +40,7 @@ class Pipe:
         
         language = []
         # TODO: undo 10 reviews only
-        for sentence in lang_stop[:10]:
+        for sentence in lang_stop[:100]:
             new_word = ts.google(sentence,from_language=self.lang,to_language='en')
             language.append(new_word)
         return language

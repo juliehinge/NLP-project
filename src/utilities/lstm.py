@@ -1,7 +1,6 @@
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -9,10 +8,12 @@ from torch.utils.data import TensorDataset, DataLoader
 
 import numpy as np
 
+from datetime import date
 
-class LSTM_test(nn.Module):
+
+class LstmModel(nn.Module):
     def __init__(self):
-        super(LSTM_test, self).__init__()
+        super(LstmModel, self).__init__()
         self.lstm = nn.LSTM(300, 100, num_layers=2, bidirectional=True, batch_first=True, dropout=.2)
         self.l1 = nn.Linear(200, 100)
         self.l2 = nn.Linear(100, 1)
@@ -35,16 +36,48 @@ class LSTM_test(nn.Module):
         
         x = self.sig(x)
 
-        print("> LSTM done")        
         return x
 
+class LSTM:
 
+    def __init__(self):
+        self.model = LstmModel()
+    
+    def train(self, epochs, trainloader):
 
+        print('> Started Training')
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+        loss_fn = nn.BCELoss(reduction='mean')
 
-#td = TensorDataset(torch_emb, target)
-#dl = DataLoader(td, batch_size=120, shuffle=True)
+        for epoch in range(epochs):  # loop over the dataset multiple times
 
-model = LSTM_test()
+            running_loss = 0.0
+            for i, data in enumerate(trainloader, 0):
+
+                # get the inputs; data is a list of [inputs, labels]
+                inputs, labels = data
+
+                # zero the parameter gradients
+                optimizer.zero_grad()
+
+                # forward + backward + optimize
+                outputs = self.model(inputs)
+                loss = loss_fn(outputs, labels)
+                loss.backward()
+                optimizer.step()
+
+                # print statistics
+                running_loss += loss.item()
+                batches_print = 1 # print every x mini-batches
+                if i % batches_print == (batches_print - 1):
+                    print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / batches_print:.3f}')
+                    running_loss = 0.0
+        print('> Finished Training')
+
+        filename = date.today().strftime("%b-%d-%Y")
+        filepath = f'data/trainedmodels/{filename}.model'
+        torch.save(self.model.state_dict(), filepath)
+        print(f'> Saved the trained model to {filepath}\n')
 
 
 def loss_calc(_range, td, dl):
@@ -68,14 +101,3 @@ def loss_calc(_range, td, dl):
         print(np.mean(losses))
         lossssss.append(np.mean(losses))
     return lossssss
-
-
-#loss = loss_calc(10)
-
-
-
-#pred = torch.round(model(torch_emb[:100])[0])
-#acc = sum(pred == target[:100]) / 100
-
-#torch.sum(model(test_torch_emb) == test_target) / test_target.size(0)
-
