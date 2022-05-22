@@ -1,24 +1,19 @@
 print('> Loading modules\n')
 from utilities.translation_pipeline import Pipe
-from utilities.loaders import load_reviews
-
-import gensim
-from gensim.models import Word2Vec
-
+from utilities.loaders import load_reviews, load_w2vec_model
 import warnings
 warnings.filterwarnings('ignore')
 
 # Flags
-LOCAL_DATA = True
+LOCAL_DATA = True # Reviews and models are downloaded if True
 
 def main():
 
     data = load_reviews(LOCAL_DATA)
-
-    # TODO: add to readme that these need to be downloaded and put to the langmodel folder
-    # or try to find a function that does this automatically
-    print('> Loading germans word2vec from gensim\n')
-    de_model = gensim.models.KeyedVectors.load_word2vec_format("data/langmodels/wiki.de.align.vec", limit=10000)
+    de_model = load_w2vec_model(
+        "https://dl.fbaipublicfiles.com/fasttext/vectors-aligned/wiki.de.align.vec",
+        LOCAL_DATA
+    )
 
     print('> Map stars into corresponding sentiment\n')
     data['sentiment'] = data.stars.replace({4:1, 5:1, 1:0, 2:0})
