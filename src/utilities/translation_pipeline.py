@@ -129,3 +129,20 @@ class Pipe:
                 result[i] = emb_en
 
         return torch.Tensor(result)
+
+
+# Anna code
+def prepare_data(df, la_model, language, stop_la, seq_length, num_samples=-1):
+    df['sentiment'] = df.stars.replace({4: 1, 5: 1, 1: 0, 2: 0})
+
+    la_data = df.loc[
+        (df['language'] == language) & (df['stars'] != 3), ['review_body', 'language', 'sentiment', 'product_category']]
+    la_df = la_data.loc[
+        (la_data['product_category'] == 'home'), ['review_body', 'language', 'sentiment', 'product_category']]
+
+    pipe = Pipe(la_df[:num_samples], stop_la, language, la_model, seq_length)
+    torch_data = pipe.emb()
+
+    target = la_df['sentiment'].to_numpy()[:num_samples]
+    target = torch.from_numpy(target).float().reshape(-1, 1)
+    return torch_data, target
