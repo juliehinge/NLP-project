@@ -30,6 +30,8 @@ FRAC_TRAINING_SAMPLES = .02 # Fraction of training samples to be used
 RUN_FINAL_TEST = False # should be ran only once
 FINAL_MODEL_PATH = None # Example: 'data/trainedmodels/May-24-2022-12.pt'
 
+# TODO: download german and english fast text aligned models
+
 def main():
 
 
