@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
-from torchmetrics import F1Score, Accuracy
+from sklearn.metrics import accuracy_score, f1_score
 
 import numpy as np
 import warnings
@@ -22,7 +22,7 @@ LOCAL_DATA = True # Reviews and models are downloaded if True
 LOCAL_MODEL = True
 TORCH_DATA_TRAIN_PATH = None # Path to the saved torch data
 TORCH_DATA_VAL_PATH = None # Path to the saved torch data
-FRAC_TRAINING_SAMPLES = .05 # Fraction of training samples to be used
+FRAC_TRAINING_SAMPLES = .02 # Fraction of training samples to be used
 
 def main():
 
@@ -58,7 +58,7 @@ def main():
     training_loader = DataLoader(td, batch_size=5, shuffle=True)
 
     print('> Started Training')
-    lstm = LSTM(batches_print=1)
+    lstm = LSTM(batches_print=5)
     lstm.train(
        epochs=2,
        trainloader=training_loader
@@ -102,11 +102,9 @@ def main():
         yhat = probs.detach().apply_(lambda prob: 1 if prob > .5 else 0).to(torch.int8)
 
         # Compute corresponding metrics
-        f1 = F1Score(num_classes=2)
-        print(f'>> F1: {f1(yhat, ytrue)}')
-
-        accuracy = Accuracy(num_classes=2)
-        print(f'>> Accuracy: {accuracy(yhat, ytrue)}')
+        yhat, ytrue = yhat.numpy(), ytrue.numpy()
+        print(f'>> F1: {f1_score(ytrue, yhat)}')
+        print(f'>> Accuracy: {accuracy_score(ytrue, yhat)}')
 
     print()
 
