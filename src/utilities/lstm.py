@@ -8,7 +8,7 @@ from torch.utils.data import TensorDataset, DataLoader
 
 import numpy as np
 
-from datetime import date
+from datetime import datetime
 
 
 class LstmModel(nn.Module):
@@ -40,18 +40,19 @@ class LstmModel(nn.Module):
 
 class LSTM:
 
-    def __init__(self):
+    def __init__(self, batches_print):
         self.model = LstmModel()
+        self.batches_print = batches_print # print every x mini-batches
     
     def train(self, epochs, trainloader):
 
-        print('> Started Training')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
         loss_fn = nn.BCELoss(reduction='mean')
 
         for epoch in range(epochs):  # loop over the dataset multiple times
-
+            
             running_loss = 0.0
+
             for i, data in enumerate(trainloader, 0):
 
                 # get the inputs; data is a list of [inputs, labels]
@@ -66,16 +67,14 @@ class LSTM:
                 loss.backward()
                 optimizer.step()
 
-                # print statistics
                 running_loss += loss.item()
-                batches_print = 1 # print every x mini-batches
+                batches_print = self.batches_print # print every x mini-batches
                 if i % batches_print == (batches_print - 1):
                     print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / batches_print:.3f}')
                     running_loss = 0.0
-        print('> Finished Training')
 
-        filename = date.today().strftime("%b-%d-%Y")
-        filepath = f'data/trainedmodels/{filename}.model'
+        filename = datetime.now().strftime("%b-%d-%Y-%H")
+        filepath = f'data/trainedmodels/{filename}.pt'
         torch.save(self.model.state_dict(), filepath)
         print(f'> Saved the trained model to {filepath}\n')
 
@@ -101,3 +100,7 @@ def loss_calc(_range, td, dl):
         print(np.mean(losses))
         lossssss.append(np.mean(losses))
     return lossssss
+
+
+
+

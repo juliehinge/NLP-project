@@ -98,7 +98,7 @@ class Pipe:
         # Third dimension = size of embeddings - for all 300 
         result = np.empty((len(reviews), 128, 300))
         for i, review in enumerate(reviews):
-            
+            print(len(review))
             emb_en = np.empty((len(review), 300))
             for j, token in enumerate(review[:128]): # Making sure that maximum # of tokens is 128
                 
@@ -119,5 +119,6 @@ class Pipe:
             else:
           #      pass
                result[i] = np.zeros(300)
+               result[i] = 
 
         return torch.Tensor(result)
