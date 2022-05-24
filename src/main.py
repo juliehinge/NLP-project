@@ -30,10 +30,9 @@ FRAC_TRAINING_SAMPLES = .02 # Fraction of training samples to be used
 RUN_FINAL_TEST = False # should be ran only once
 FINAL_MODEL_PATH = None # Example: 'data/trainedmodels/May-24-2022-12.pt'
 
-# TODO: download german and english fast text aligned models
+# TODO: download german and english fast text aligned models 
 
 def main():
-
 
     # ----- PART 1: Train BiLSTM on english reviews
     # Training BiLSTM
@@ -45,16 +44,18 @@ def main():
         bilstm_model = train_bilstm()
 
     # ----- PART 2: Testing methods
-    # Load german testing data
-    test_data_de = load_reviews(LOCAL_DATA, 'test')
-    reviews_test_de, target_test_de = prepare_data(
-        df=test_data_de,
-        language='de',
-        frac_samples=1
-    )
-    print(f"> Size of test data: {len(reviews_test_de)}\n")
-
     if RUN_FINAL_TEST:
+        
+        # Load german testing data
+        test_data_de = load_reviews(LOCAL_DATA, 'test')
+        reviews_test_de, target_test_de = prepare_data(
+            df=test_data_de,
+            language='de',
+            frac_samples=1
+        )
+        print(f"> Size of test data: {len(reviews_test_de)}\n")
+
+    
         method1(reviews_test_de, target_test_de, bilstm_model)
         method2(reviews_test_de, target_test_de, bilstm_model)
 
