@@ -65,7 +65,7 @@ class EmbeddingsPipeline:
         """
 
         if self.translate:
-            reviews = translate_reviews(reviews)
+            reviews = self.translate_reviews(reviews)
         
         # Final nested list to be returned
         token_list = []
