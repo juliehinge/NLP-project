@@ -17,6 +17,10 @@ import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+
 # Flags related to the whole experiment
 LOCAL_DATA = True # Reviews and models are downloaded if True
 LOCAL_MODEL = True
@@ -24,13 +28,13 @@ LOCAL_MODEL = True
 # Flags related to training of BiLSTM
 TORCH_DATA_TRAIN_PATH = None # Path to the saved torch data
 TORCH_DATA_VAL_PATH = None # Path to the saved torch data
-FRAC_TRAINING_SAMPLES = .02 # Fraction of training samples to be used
+FRAC_TRAINING_SAMPLES = .1 # Fraction of training samples to be used
 
 # Flags related to test phase
 RUN_FINAL_TEST = False # should be ran only once
 FINAL_MODEL_PATH = None # Example: 'data/trainedmodels/May-24-2022-12.pt'
 
-# TODO: download german and english fast text aligned models 
+
 
 def main():
 
@@ -45,7 +49,7 @@ def main():
 
     # ----- PART 2: Testing methods
     if RUN_FINAL_TEST:
-        
+
         # Load german testing data
         test_data_de = load_reviews(LOCAL_DATA, 'test')
         reviews_test_de, target_test_de = prepare_data(
@@ -174,12 +178,12 @@ def train_bilstm():
 
     print('> Getting the training loader object\n')
     td = TensorDataset(torch_data_train, target_train)
-    training_loader = DataLoader(td, batch_size=5, shuffle=True)
+    training_loader = DataLoader(td, batch_size=50, shuffle=True)
 
     print('> Started Training')
     lstm = LSTM(batches_print=5)
     lstm.train(
-       epochs=2,
+       epochs=35,
        trainloader=training_loader
     )
     print('> Finished Training')

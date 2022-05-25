@@ -9,7 +9,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import numpy as np
 
 from datetime import datetime
-
+import matplotlib.pyplot as plt
 
 class LstmModel(nn.Module):
     def __init__(self):
@@ -19,7 +19,7 @@ class LstmModel(nn.Module):
         self.l2 = nn.Linear(100, 1)
         self.relu = nn.ReLU()
         self.sig = nn.Sigmoid()
-        self.drop = nn.Dropout(.2)
+        self.drop = nn.Dropout(.1)
         
     def forward(self, x):
         x, (h, c) = self.lstm(x)
@@ -46,11 +46,14 @@ class LSTM:
     
     def train(self, epochs, trainloader):
 
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.003)
         loss_fn = nn.BCELoss(reduction='mean')
+
+        loss_hist = []
 
         for epoch in range(epochs):  # loop over the dataset multiple times
             
+
             running_loss = 0.0
 
             for i, data in enumerate(trainloader, 0):
@@ -67,40 +70,19 @@ class LSTM:
                 loss.backward()
                 optimizer.step()
 
+
                 running_loss += loss.item()
                 batches_print = self.batches_print # print every x mini-batches
                 if i % batches_print == (batches_print - 1):
                     print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / batches_print:.3f}')
+                    loss_hist.append(running_loss/batches_print)
                     running_loss = 0.0
+
+        print(loss_hist)
+        plt.plot(np.arange(len(loss_hist)), loss_hist)
+        plt.show()
 
         filename = datetime.now().strftime("%b-%d-%Y-%H")
         filepath = f'data/trainedmodels/{filename}.pt'
         torch.save(self.model.state_dict(), filepath)
         print(f'> Saved the trained model to {filepath}\n')
-
-
-def loss_calc(_range, td, dl):
-
-    print("> Calculating the loss")
-    loss_fn = nn.BCELoss(reduction='mean')
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    
-    lossssss = []
-    for epoch in range(_range):
-        print(epoch)
-        losses = []
-        for x, y in dl:
-            optimizer.zero_grad()
-            loss = loss_fn(model(x), y)
-            loss.backward()
-
-            # nn.utils.clip_grad_norm_(model.parameters(), 5)
-            optimizer.step()
-            losses.append(loss.item())
-        print(np.mean(losses))
-        lossssss.append(np.mean(losses))
-    return lossssss
-
-
-
-
