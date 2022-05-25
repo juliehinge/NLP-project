@@ -1,5 +1,4 @@
 
-print('> Loading modules\n')
 from utilities.translation_pipeline import EmbeddingsPipeline, prepare_data
 from utilities.loaders import load_reviews, load_w2vec_model
 from utilities.lstm import LSTM, LstmModel
@@ -28,7 +27,8 @@ LOCAL_MODEL = True
 # Flags related to training of BiLSTM
 TORCH_DATA_TRAIN_PATH = None # Path to the saved torch data
 TORCH_DATA_VAL_PATH = None # Path to the saved torch data
-FRAC_TRAINING_SAMPLES = .1 # Fraction of training samples to be used
+FRAC_TRAINING_SAMPLES = .025 # Fraction of training samples to be used
+BATCH_SIZE = 50
 
 # Flags related to test phase
 RUN_FINAL_TEST = False # should be ran only once
@@ -148,19 +148,18 @@ def method2(reviews_test_de, target_test_de, model):
 
 def train_bilstm():
 
-    # --------- Training phase of BiLSTM on English dataset
+    # Load pretrained eng w2vec
+    en_model = load_w2vec_model(
+        "https://dl.fbaipublicfiles.com/fasttext/vectors-aligned/wiki.en.align.vec",
+        LOCAL_MODEL
+    )
+    
     # Load training data
     training_data_en = load_reviews(LOCAL_DATA, 'train')
     reviews_train, target_train = prepare_data(
         df=training_data_en,
         language='en',
         frac_samples=FRAC_TRAINING_SAMPLES
-    )
-    
-    # Load pretrained eng w2vec
-    en_model = load_w2vec_model(
-        "https://dl.fbaipublicfiles.com/fasttext/vectors-aligned/wiki.en.align.vec",
-        LOCAL_MODEL
     )
 
     print('> Transforming the training data into tensors\n')
@@ -178,21 +177,9 @@ def train_bilstm():
 
     print('> Getting the training loader object\n')
     td = TensorDataset(torch_data_train, target_train)
-    training_loader = DataLoader(td, batch_size=50, shuffle=True)
+    training_loader = DataLoader(td, batch_size=BATCH_SIZE, shuffle=True)
 
-    print('> Started Training')
-    lstm = LSTM(batches_print=5)
-    lstm.train(
-       epochs=35,
-       trainloader=training_loader
-    )
-    print('> Finished Training')
-
-    # Important to do after training is done
-    lstm.model.eval()
-
-    # --------- Validation phase of BiLSTM on English dataset
-    # -- load validation data
+    # Load validation data
     validation_data_en = load_reviews(LOCAL_DATA, 'validation')
     reviews_val, target_val = prepare_data(
         df=validation_data_en,
@@ -215,22 +202,31 @@ def train_bilstm():
     print('> Getting the validation loader object\n')
     td = TensorDataset(torch_data_val, target_val)
     val_loader = DataLoader(td, batch_size=len(torch_data_val))
-    
+
+    # --------- Training phase of BiLSTM on English dataset
+    print('> Started Training')
+    lstm = LSTM(batches_print=5)
+    lstm.train(
+       epochs=5,
+       trainloader=training_loader,
+       valoader=val_loader
+    )
+    print('> Finished Training')
+
+
+    # --------- Validation phase of BiLSTM on English dataset
     print("> Validation performance")
-    for valdata in val_loader:
+    x, y_true = next(iter(val_loader))
+    ytrue = y_true.flatten().to(torch.int8)
 
-        # Prepate input data
-        x, y_true = valdata
-        ytrue = y_true.flatten().to(torch.int8)
+    # Compute yhat
+    probs = torch.flatten(lstm.model(x))
+    yhat = probs.detach().apply_(lambda prob: 1 if prob > .5 else 0).to(torch.int8)
 
-        # Compute yhat
-        probs = torch.flatten(lstm.model(x))
-        yhat = probs.detach().apply_(lambda prob: 1 if prob > .5 else 0).to(torch.int8)
-
-        # Compute corresponding metrics
-        yhat, ytrue = yhat.numpy(), ytrue.numpy()
-        print(f'>> F1: {f1_score(ytrue, yhat)}')
-        print(f'>> Accuracy: {accuracy_score(ytrue, yhat)}')
+    # Compute corresponding metrics
+    yhat, ytrue = yhat.numpy(), ytrue.numpy()
+    print(f'>> F1: {f1_score(ytrue, yhat)}')
+    print(f'>> Accuracy: {accuracy_score(ytrue, yhat)}')
 
     print()
 
