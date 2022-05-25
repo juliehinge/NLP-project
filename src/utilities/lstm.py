@@ -51,7 +51,7 @@ class LSTM:
         # turn training mode on
         self.model.train()
 
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.003)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.003, weight_decay=0.001)
         
         loss_train_hist = []
         loss_val_hist = []

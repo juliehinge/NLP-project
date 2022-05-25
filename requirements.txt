@@ -1,11 +1,11 @@
 translators
 datasets
-utilities
 torch
-sklearn
+scikit-learn
 numpy
-warnings
-datetime
 pandas
 gensim
 requests
+seaborn
+regex
+nltk

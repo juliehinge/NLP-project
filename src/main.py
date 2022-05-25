@@ -16,13 +16,12 @@ import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 
 # Flags related to the whole experiment
-LOCAL_DATA = True # Reviews and models are downloaded if True
-LOCAL_MODEL = True
+LOCAL_DATA = False # Reviews and models are downloaded if True
+LOCAL_MODEL = False
 
 # Flags related to training of BiLSTM
 TORCH_DATA_TRAIN_PATH = None # Path to the saved torch data
