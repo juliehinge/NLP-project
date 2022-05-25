@@ -11,6 +11,7 @@ import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
+sns.set_theme()
 
 class LstmModel(nn.Module):
     def __init__(self):
@@ -98,8 +99,14 @@ class LSTM:
         # Save the development of loss: train vs val
         fig, ax = plt.subplots()
         x = [i for i in range(1, epochs+1)]
-        sns.lineplot(x, loss_train_hist, ax=ax, label='train loss')
-        sns.lineplot(x, loss_val_hist, ax=ax, label='validation loss')
+        sns.lineplot(x, loss_train_hist, ax=ax, label='Training loss')
+        sns.lineplot(x, loss_val_hist, ax=ax, label='Validation loss')
+        #ax.set_ylim([0, 1])
+        plt.xticks(x)
+        plt.title('Training vs. validation loss',weight="bold")
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+
 
         filename = datetime.now().strftime("%b-%d-%Y-%H--trainvsval_loss")
         fig.savefig(f'data/figures/{filename}')
