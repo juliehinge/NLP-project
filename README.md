@@ -1,6 +1,6 @@
 # NLP-project, group 1
 
-This experiment is using a bidirectional long short-term memory network (biLSTM), to predict the sentiment of Amazon product reviews. Our approach tackles the problem by adapting the resources available in one language to other languages and can be seen as a solution to problems that require the transfer of sentiment classification knowledge between two or more languages. The transfer learning approach is applied by creating embeddings using aligned vectors from FastText and corpora in the chosen languages, English and German. These languages will then be passed  to our BiLSTM network that will predict if the review has a positive or negative sentiment. By using this approach we will examine the novel part of the research, which is cross-lingual sentiment classification with English as the source language and German as the target language. The main objectives are presented, including current resources in sentiment classification for the target language and exploration of the chosen methods, consisting of an alignment method and a method using Google Translate. 
+This research paper examines the problem of labelling reviews with either a positive or negative sentiment, in a cross-lingual setting using a BiLSTM model. Two methods were implemented to compare different approaches. A method using Google Translate to translate a target language to a source language, compared to using aligned word embeddings using FastText. As expected, our project shows that the method using Google Translate achieves higher evaluation scores in sentiment classification tasks than the alignment method. Our results can be reproduced by cloning our repository: https://github.itu.dk/juhi/nlp-project.  
 
 ## Clone the repository
 You should clone our repository in order to reproduce our result.
@@ -26,7 +26,7 @@ pip install -r requirements.txt
 The following commands will run all our code, but first it downloads all the necessary data, which takes a while. 
 ```
 cd src
-python main.py
+python main.py 
 ```
 
 

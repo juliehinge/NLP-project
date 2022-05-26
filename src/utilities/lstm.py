@@ -1,10 +1,8 @@
+import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 
-import torch
-import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import TensorDataset, DataLoader
 
 import numpy as np
 
@@ -52,7 +50,7 @@ class LSTM:
         # turn training mode on
         self.model.train()
 
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.003, weight_decay=0.001)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.003)
         
         loss_train_hist = []
         loss_val_hist = []

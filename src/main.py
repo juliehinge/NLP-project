@@ -16,8 +16,6 @@ import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
-import numpy as np
-
 
 # Flags related to the whole experiment
 LOCAL_DATA = False # Reviews and models are downloaded if True
@@ -26,11 +24,11 @@ LOCAL_MODEL = False
 # Flags related to training of BiLSTM
 TORCH_DATA_TRAIN_PATH = None # Path to the saved torch data
 TORCH_DATA_VAL_PATH = None # Path to the saved torch data
-FRAC_TRAINING_SAMPLES = .025 # Fraction of training samples to be used
-BATCH_SIZE = 50
+FRAC_TRAINING_SAMPLES = 1 # Fraction of training samples to be used
+BATCH_SIZE = 25
 
 # Flags related to test phase
-RUN_FINAL_TEST = False # should be ran only once
+RUN_FINAL_TEST = True # should be ran only once
 FINAL_MODEL_PATH = None # Example: 'data/trainedmodels/May-24-2022-12.pt'
 
 
@@ -206,7 +204,7 @@ def train_bilstm():
     print('> Started Training')
     lstm = LSTM(batches_print=5)
     lstm.train(
-       epochs=5,
+       epochs=10,
        trainloader=training_loader,
        valoader=val_loader
     )
